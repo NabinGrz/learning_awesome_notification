@@ -4,7 +4,9 @@ import 'package:learning_awesome_notification/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeNotifications();
+  // await initializeNotifications();
+  final notificationService = NotificationService();
+  await notificationService.initialize();
   runApp(const MyApp());
 }
 
@@ -36,6 +38,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final notificationService = NotificationService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,8 +51,8 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "Basic Notification",
                   body: "This is a Basic Notification",
                 );
@@ -57,8 +60,8 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("Default Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "Basic Notification",
                   body: "This is a Basic Notification",
                   summary: "This is Basic Summary",
@@ -69,11 +72,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton.icon(
               onPressed: () async {
-                await showNotification(
+                await notificationService.showNotification(
                   title: "Basic Notification",
                   body: "This is a Basic Notification",
                   summary: "This is Basic Summary",
-                  notificationLayout: NotificationLayout.BigPicture,
+                  notificationLayout: NotificationLayout.Messaging,
                   bigPicture:
                       "https://i0.wp.com/devhq.in/wp-content/uploads/2024/07/2.png?w=1280&ssl=1",
                 );
@@ -81,8 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("BigPicture Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "Action noti",
                   body: "This is a Action",
                   payload: {
@@ -94,15 +97,45 @@ class _MyHomePageState extends State<MyHomePage> {
                       label: "Demo Page",
                       actionType: ActionType.SilentAction,
                       color: Colors.deepPurple,
-                    )
+                    ),
+                    NotificationActionButton(
+                      key: 'demo',
+                      label: "Demo Page",
+                      actionType: ActionType.SilentAction,
+                      color: Colors.deepPurple,
+                    ),
+                    NotificationActionButton(
+                      key: 'demo',
+                      label: "Demo Page",
+                      actionType: ActionType.SilentAction,
+                      color: Colors.deepPurple,
+                    ),
+                    NotificationActionButton(
+                      key: 'demo',
+                      label: "Demo Page",
+                      actionType: ActionType.SilentAction,
+                      color: Colors.deepPurple,
+                    ),
+                    NotificationActionButton(
+                      key: 'demo',
+                      label: "Demo Page",
+                      actionType: ActionType.SilentAction,
+                      color: Colors.deepPurple,
+                    ),
+                    NotificationActionButton(
+                      key: 'demo',
+                      label: "Demo Page",
+                      actionType: ActionType.SilentAction,
+                      color: Colors.deepPurple,
+                    ),
                   ],
                 );
               },
               label: const Text("Action Button Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "Big Text Notification",
                   body: "This is Big Text",
                   notificationLayout: NotificationLayout.BigText,
@@ -111,8 +144,8 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("BigText Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "Song Downloading",
                   body: "Please wait",
                   notificationLayout: NotificationLayout.ProgressBar,
@@ -121,8 +154,8 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("ProgressBar Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "Nitish Kumar",
                   body: "Hello What are you doing",
                   notificationLayout: NotificationLayout.Messaging,
@@ -131,8 +164,8 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("Messaging Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "Nitish Kumar",
                   body: "Hello What are you doing",
                   notificationLayout: NotificationLayout.MessagingGroup,
@@ -141,8 +174,8 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("Messaging Group Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "New song playing",
                   body: "Arjit ",
                   notificationLayout: NotificationLayout.MediaPlayer,
@@ -151,8 +184,8 @@ class _MyHomePageState extends State<MyHomePage> {
               label: const Text("MediaPlayer Notification"),
             ),
             ElevatedButton.icon(
-              onPressed: () {
-                showNotification(
+              onPressed: () async {
+                await notificationService.showNotification(
                   title: "New song playing",
                   body: "Arjit ",
                   notificationLayout: NotificationLayout.MediaPlayer,

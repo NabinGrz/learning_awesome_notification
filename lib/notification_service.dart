@@ -1,114 +1,177 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:learning_awesome_notification/landing_page.dart';
-
 import 'main.dart';
 
-Future<void> initializeNotifications() async {
-  await AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelGroupKey: 'high_importance_channel',
-        channelKey: 'high_importance_channel',
-        channelName: 'Basic Notification',
-        channelDescription: 'Notification channel for learning',
-        defaultColor: Colors.purple,
-        ledColor: Colors.red,
-        importance: NotificationImportance.Max,
-        channelShowBadge: true,
-        onlyAlertOnce: true,
-        playSound: true,
-        criticalAlerts: true,
-      ),
-    ],
-    channelGroups: [
-      NotificationChannelGroup(
-        channelGroupKey: 'high_importance_channel_group',
-        channelGroupName: 'Group 1',
-      )
-    ],
-    debug: true,
-  );
+/// Notification constants for better maintainability.
+class NotificationConstants {
+  NotificationConstants._();
 
-  await AwesomeNotifications().isNotificationAllowed().then(
-    (isAllowed) async {
-      if (!isAllowed) {
-        await AwesomeNotifications().requestPermissionToSendNotifications();
-      }
-    },
-  );
-
-  await AwesomeNotifications().setListeners(
-      onActionReceivedMethod:
-          onActionReceivedMethod, //!! TO HANDLE TAP OR CLICK ON NOTIICATION AND ACT ACCORDINGLY
-      onNotificationDisplayedMethod:
-          onNotificationDisplayedMethod, //!! WHEN NOTIFICATION IS DISPLAYED SUCCESSFULLY
-      onNotificationCreatedMethod:
-          onNotificationCreatedMethod, //!! WHEN NOTIFICATION IS CREATED BY OS
-      onDismissActionReceivedMethod:
-          onDismissActionReceivedMethod //!! WHEN NOTIFICATION IS REMOVED/DIMISSED FROM PANNEL
-      );
+  static const String highImportanceChannelKey = 'high_importance_channel';
+  static const String highImportanceChannelGroupKey =
+      'high_importance_channel_group';
+  static const String highImportanceChannelName = 'Basic Notification';
+  static const String highImportanceChannelDescription =
+      'Notification channel for learning';
+  static const Color defaultColor = Colors.purple;
+  static const Color ledColor = Colors.red;
 }
 
-Future<void> onActionReceivedMethod(ReceivedAction recivedAction) async {
-  debugPrint("On Action Recived");
-  final payload = recivedAction.payload ?? {};
-  if (payload['navigate'] == 'true') {
-    MyApp.navigatorKey.currentState?.push(MaterialPageRoute(
-      builder: (_) => const LandingPage(),
-    ));
+/// A singleton service class to handle notifications throughout the app.
+class NotificationService {
+  static final NotificationService _instance = NotificationService._internal();
+  final AwesomeNotifications _awesomeNotifications = AwesomeNotifications();
+
+  /// Private constructor for singleton implementation.
+  factory NotificationService() => _instance;
+
+  NotificationService._internal();
+
+  /// Initializes the notification service.
+  Future<void> initialize() async {
+    await _initializeChannels();
+    await _requestNotificationPermissions();
+    _setNotificationListeners();
   }
-}
 
-Future<void> onNotificationCreatedMethod(
-    ReceivedNotification notification) async {
-  debugPrint("On Notification Created Method");
-}
-
-Future<void> onNotificationDisplayedMethod(
-    ReceivedNotification recivedAction) async {
-  debugPrint("On Notification Displayed");
-}
-
-Future<void> onDismissActionReceivedMethod(ReceivedAction recivedAction) async {
-  debugPrint("On Notification Received");
-}
-
-Future<void> showNotification({
-  required final String title,
-  required final String body,
-  final String? summary,
-  final Map<String, String>? payload,
-  final ActionType actionType = ActionType.Default,
-  final NotificationLayout notificationLayout = NotificationLayout.Default,
-  final NotificationCategory? category,
-  final String? bigPicture,
-  final List<NotificationActionButton>? actionButtons,
-  final bool scheduled = false,
-  final int? interval,
-}) async {
-  assert(!scheduled || (scheduled && interval != null));
-  await AwesomeNotifications().createNotification(
-    content: NotificationContent(
-      id: -1,
-      channelKey: 'high_importance_channel',
-      title: title,
-      body: body,
-      actionType: actionType,
-      notificationLayout: notificationLayout,
-      summary: summary,
-      category: category,
-      payload: payload,
-      bigPicture: bigPicture,
-    ),
-    actionButtons: actionButtons,
-    schedule: scheduled
-        ? NotificationInterval(
-            interval: interval,
-            timeZone: AwesomeNotifications.localTimeZoneIdentifier,
-            preciseAlarm: true,
+  /// Initializes notification channels and groups.
+  Future<void> _initializeChannels() async {
+    try {
+      await _awesomeNotifications.initialize(
+        null,
+        [
+          NotificationChannel(
+            channelGroupKey:
+                NotificationConstants.highImportanceChannelGroupKey,
+            channelKey: NotificationConstants.highImportanceChannelKey,
+            channelName: NotificationConstants.highImportanceChannelName,
+            channelDescription:
+                NotificationConstants.highImportanceChannelDescription,
+            defaultColor: NotificationConstants.defaultColor,
+            ledColor: NotificationConstants.ledColor,
+            importance: NotificationImportance.Max,
+            channelShowBadge: true,
+            onlyAlertOnce: true,
+            playSound: true,
+            criticalAlerts: true,
+          ),
+        ],
+        channelGroups: [
+          NotificationChannelGroup(
+            channelGroupKey:
+                NotificationConstants.highImportanceChannelGroupKey,
+            channelGroupName: 'Group 1',
           )
-        : null,
-  );
+        ],
+        debug: true,
+      );
+    } catch (e) {
+      debugPrint('Failed to initialize notification channels: $e');
+    }
+  }
+
+  /// Requests permission from the user to send notifications.
+  Future<void> _requestNotificationPermissions() async {
+    try {
+      final isAllowed = await _awesomeNotifications.isNotificationAllowed();
+      if (!isAllowed) {
+        await _awesomeNotifications.requestPermissionToSendNotifications();
+      }
+    } catch (e) {
+      debugPrint('Failed to request notification permissions: $e');
+    }
+  }
+
+  /// Sets up listeners for notification events.
+  void _setNotificationListeners() {
+    try {
+      _awesomeNotifications.setListeners(
+        onActionReceivedMethod: _onActionReceived,
+        onNotificationDisplayedMethod: _onNotificationDisplayed,
+        onNotificationCreatedMethod: _onNotificationCreated,
+        onDismissActionReceivedMethod: _onDismissActionReceived,
+      );
+    } catch (e) {
+      debugPrint('Failed to set notification listeners: $e');
+    }
+  }
+
+  /// Handles when a notification action is received (e.g., notification tap).
+  static Future<void> _onActionReceived(ReceivedAction receivedAction) async {
+    debugPrint("Notification action received");
+    final payload = receivedAction.payload ?? {};
+    if (payload['navigate'] == 'true') {
+      MyApp.navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => const LandingPage(),
+        ),
+      );
+    }
+  }
+
+  /// Handles when a notification is successfully created.
+  static Future<void> _onNotificationCreated(
+      ReceivedNotification notification) async {
+    debugPrint("Notification created");
+  }
+
+  /// Handles when a notification is displayed to the user.
+  static Future<void> _onNotificationDisplayed(
+      ReceivedNotification receivedAction) async {
+    debugPrint("Notification displayed");
+  }
+
+  /// Handles when a notification is dismissed by the user.
+  static Future<void> _onDismissActionReceived(
+      ReceivedAction receivedAction) async {
+    debugPrint("Notification dismissed");
+  }
+
+  /// Shows a basic notification with the given details.
+  Future<void> showNotification({
+    required String title,
+    required String body,
+    String? summary,
+    Map<String, String>? payload,
+    ActionType actionType = ActionType.Default,
+    NotificationLayout notificationLayout = NotificationLayout.Default,
+    NotificationCategory? category,
+    String? bigPicture,
+    List<NotificationActionButton>? actionButtons,
+    bool scheduled = false,
+    int? interval,
+  }) async {
+    assert(!scheduled || (scheduled && interval != null));
+
+    try {
+      final notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      await _awesomeNotifications.createNotification(
+        content: NotificationContent(
+          id: notificationId,
+          channelKey: NotificationConstants.highImportanceChannelKey,
+          title: title,
+          body: body,
+          actionType: actionType,
+          notificationLayout: notificationLayout,
+          summary: summary,
+          category: category,
+          payload: payload,
+          bigPicture: bigPicture,
+          largeIcon: bigPicture,
+          backgroundColor: Colors.pink,
+        ),
+        actionButtons: actionButtons,
+        schedule: scheduled
+            ? NotificationInterval(
+                interval: interval,
+                timeZone: AwesomeNotifications.localTimeZoneIdentifier,
+                preciseAlarm: true,
+              )
+            : null,
+      );
+    } catch (e) {
+      debugPrint('Failed to show notification: $e');
+    }
+  }
 }
