@@ -38,7 +38,7 @@ class NotificationService {
   Future<void> _initializeChannels() async {
     try {
       await _awesomeNotifications.initialize(
-        null,
+        'resource://drawable/icon',
         [
           NotificationChannel(
             channelGroupKey:
@@ -51,9 +51,12 @@ class NotificationService {
             ledColor: NotificationConstants.ledColor,
             importance: NotificationImportance.Max,
             channelShowBadge: true,
-            onlyAlertOnce: true,
+            // onlyAlertOnce: true,
             playSound: true,
-            criticalAlerts: true,
+            // criticalAlerts: true,
+            soundSource: 'resource://raw/nabin',
+            defaultRingtoneType: DefaultRingtoneType.Notification,
+            vibrationPattern: lowVibrationPattern,
           ),
         ],
         channelGroups: [
