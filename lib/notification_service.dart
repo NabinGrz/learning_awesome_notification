@@ -135,6 +135,7 @@ class NotificationService {
     required String title,
     required String body,
     String? summary,
+    int? id,
     Map<String, String>? payload,
     ActionType actionType = ActionType.Default,
     NotificationLayout notificationLayout = NotificationLayout.Default,
@@ -151,7 +152,7 @@ class NotificationService {
 
       await _awesomeNotifications.createNotification(
         content: NotificationContent(
-          id: notificationId,
+          id: id ?? notificationId,
           channelKey: NotificationConstants.highImportanceChannelKey,
           title: title,
           body: body,

@@ -156,8 +156,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton.icon(
               onPressed: () async {
                 await notificationService.showNotification(
+                  id: 010101,
                   title: "Nitish Kumar",
-                  body: "Hello What are you doing",
+                  body:
+                      "Message ${DateTime.now().millisecondsSinceEpoch ~/ 1000}",
                   notificationLayout: NotificationLayout.Messaging,
                 );
               },
@@ -166,9 +168,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton.icon(
               onPressed: () async {
                 await notificationService.showNotification(
+                  id: 0202020,
                   title: "Nitish Kumar",
-                  body: "Hello What are you doing",
-                  notificationLayout: NotificationLayout.MessagingGroup,
+                  body:
+                      "Message Group ${DateTime.now().millisecondsSinceEpoch ~/ 1000}",
+                  notificationLayout: NotificationLayout.Inbox,
+                  category: NotificationCategory.Message,
                 );
               },
               label: const Text("Messaging Group Notification"),
